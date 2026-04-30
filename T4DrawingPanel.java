@@ -21,7 +21,7 @@ public class T4DrawingPanel extends JPanel {
 
     private static final int HEIGHT = 128;
     private static final int WIDTH = 128;
-    private static final int CELL_SIZE = 12;
+    private static final int CELL_SIZE = 24;
     private static final int MAX_FONT = 1024;
     private int laby[][] = new int[HEIGHT][WIDTH];
     private int couleurPair = 0;
@@ -37,6 +37,7 @@ public class T4DrawingPanel extends JPanel {
         // set a preferred size for the custom panel.
         setPreferredSize(new Dimension(WIDTH*CELL_SIZE+CELL_SIZE,HEIGHT*CELL_SIZE+CELL_SIZE));
         clear();
+        setBackground(Color.BLACK);
     }
     
     public void clear() {
@@ -108,7 +109,7 @@ NUMBER	STANDARD COLOR	INVERTED COLOR
 
          */
 
-        final int pixelSize = 1;
+        final int pixelSize = 2;
         if (inverse) {
             if ((y/pixelSize)%2==0) {
                 g.setColor(Color.CYAN);
