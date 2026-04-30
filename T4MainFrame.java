@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  */
 public class T4MainFrame extends javax.swing.JFrame {
 
-    private DrawingPanel panel;
+    private T4DrawingPanel panel;
 
     private File savedDirectory = null;
 
@@ -36,7 +36,7 @@ public class T4MainFrame extends javax.swing.JFrame {
     public T4MainFrame() {
         initComponents();
         
-        panel = new DrawingPanel();
+        panel = new T4DrawingPanel();
 
         panel.setBackground(new Color(255, 255, 255));
         panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
