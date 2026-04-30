@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 
 class XORModeDisplayPanel extends JPanel
 {
+    private final int pixelSize = 2;
     public XORModeDisplayPanel()
     {
         setBackground(Color.BLACK);
@@ -17,70 +18,84 @@ class XORModeDisplayPanel extends JPanel
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
-
-        Font font = new Font("sansserif", Font.BOLD, 16);
-        g.setFont(font);
-        g.setColor(Color.WHITE);
-
-        g.drawString("Paint mode:", 5, 20);
-        paintInMode(g, 0, 30, false); // Use paint mode
-
-        g.setColor(Color.WHITE);
-        g.fillRect(5, 170, 220, 3);
-
-        g.drawString("XOR mode:", 5, 200);
-        paintInMode(g, 0, 210, true); // Use XOR mode
+        paintInMode(g, 0, 5,0xd5); // Use paint mode
+        paintInMode(g, 0, 5+pixelSize,0x6a);
+        paintInMode(g, 0, 5+2*pixelSize,0x40);
+        paintInMode(g, 0, 5+3*pixelSize,0x6a);
+        paintInMode(g, 0, 5+4*pixelSize,0xd5);
+        paintInMode(g, 0, 5+5*pixelSize,0x6a);
     }
 
-    private void paintInMode(Graphics g, int x, int y, boolean useXOR)
+    /*
+    .byt $d5	;1,1,0,1,0,1,0,1
+	.byt $6a	;0,1,1,0,1,0,1,0
+	.byt $40	;0,1,0,0,0,0,0,0
+	.byt $6a	;0,1,1,0,1,0,1,0
+	.byt $d5	;1,1,0,1,0,1,0,1
+	.byt $6a	;0,1,1,0,1,0,1,0
+     */
+
+
+    private void paintInMode(Graphics g, int x, int y, int val)
     {
         // Ensure we start in paint mode.
         g.setPaintMode();
 
-        // Draw a red filled rectangle
-        g.setColor(Color.RED);
-        g.fillRect(x + 10, y + 10, 80, 30);
+        // découpage bits
+        boolean inverse = (val & 0x80) > 0;
+        // bit 6
+        boolean bit6 = (val & 0x20) > 0;
+        // bit 5
+        boolean bit5 = (val & 0x10) > 0;
+        // bit 4
+        boolean bit4 = (val & 0x8) > 0;
+        // bit 3
+        boolean bit3 = (val & 0x4) > 0;
+        // bit 2
+        boolean bit2 = (val & 0x2) > 0;
+        // bit 1
+        boolean bit1 = (val & 0x1) > 0;
 
-        // Draw a green filled rectangle, overlapping the red rectangle
-        g.setColor(Color.GREEN);
-        g.fillRect(x + 50, y + 20, 80, 30);
+        /*
 
-        // Draw a blue filled rectangle, overlapping the green rectangle
-        g.setColor(Color.BLUE);
-        g.fillRect(x + 130, y + 40, 80, 30);
+NUMBER	STANDARD COLOR	INVERTED COLOR
+0	    BLACK	        WHITE
+1	    RED	            CYAN
+2	    GREEN	        MAGENTA
+3	    YELLOW	        BLUE
+4	    BLUE	        YELLOW
+5	    MAGENTA	        GREEN
+6	    CYAN	        RED
+7	    WHITE	        BLACK
 
-        if (useXOR)
-        {
-            // Set XOR mode, with a green XOR color
-            g.setXORMode(Color.GREEN);
+         */
+
+        if (inverse) {
+            if ((y/pixelSize)%2==0) {
+                g.setColor(Color.CYAN);
+            } else {
+                g.setColor(Color.YELLOW);
+            }
+        } else {
+            if ((y/pixelSize)%2==0) {
+                g.setColor(Color.RED);
+            } else {
+                g.setColor(Color.BLUE);
+            }
         }
 
-        // Draw another blue filled rectangle, offset from the previous blue one.
-        g.fillRect(x + 90, y + 30, 80, 30);
-
-        if (useXOR)
-        {
-            // Return to paint mode.
-            g.setPaintMode();
-        }
-
-        // Draw a red filled rectangle
-        g.setColor(Color.RED);
-        g.fillRect(x + 10, y + 80, 80, 30);
-
-        if (useXOR)
-        {
-            // Go into XOR mode, with an XOR color of red
-            g.setXORMode(Color.RED);
-        }
-
-        // Draw a blue filled rectangle, overlapping the red rectangle
-        g.setColor(Color.BLUE);
-        g.fillRect(x + 50, y + 90, 80, 30);
-
-        // Draw another blue filled rectangle slightly offset from the previous
-        // blue rectangle.
-        g.fillRect(x + 55, y + 95, 80, 30);
+        if (bit6)
+            g.fillRect(x, y, pixelSize, pixelSize);
+        if (bit5)
+            g.fillRect(x+pixelSize, y, pixelSize, pixelSize);
+        if (bit4)
+            g.fillRect(x+2*pixelSize, y, pixelSize, pixelSize);
+        if (bit3)
+            g.fillRect(x+3*pixelSize, y, pixelSize, pixelSize);
+        if (bit2)
+            g.fillRect(x+4*pixelSize, y, pixelSize, pixelSize);
+        if (bit1)
+            g.fillRect(x+5*pixelSize, y, pixelSize, pixelSize);
     }
 }
 
