@@ -38,7 +38,7 @@ public class T4MainFrame extends javax.swing.JFrame {
         
         panel = new T4DrawingPanel();
 
-        panel.setBackground(new Color(255, 255, 255));
+        //panel.setBackground(new Color(255, 255, 255));
         panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         
         panel.addMouseListener(new MouseAdapter() {
