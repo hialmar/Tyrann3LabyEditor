@@ -24,15 +24,21 @@ public class T4DrawingPanel extends JPanel {
     private static final int CELL_SIZE = 24;
     private static final int MAX_FONT = 1024;
     private static final int pixelSize = 2;
-    private int laby[][] = new int[HEIGHT][WIDTH];
+    private final int[][] laby = new int[HEIGHT][WIDTH];
     private int couleurPair = 0;
     private int couleurImpair = 0;
-    private int quartTuiles[] = new int[MAX_FONT*4];
+    private final int[] quartTuiles = new int[MAX_FONT*4];
     private int nbQuartTuiles = 0;
-    private int tuiles[] = new int[MAX_FONT];
+    private final int[] tuiles = new int[MAX_FONT];
     private int nbTuiles = 0;
 
     private int currentValue = 1;
+
+    private int readingIndex = 0;
+    private boolean readingColors = false;
+    private boolean readingQuartTuiles = false;
+    private boolean readingTiles = false;
+    private boolean readingMap = false;
 
     public T4DrawingPanel() {
         // set a preferred size for the custom panel.
@@ -42,11 +48,16 @@ public class T4DrawingPanel extends JPanel {
     }
     
     public void clear() {
-        for (int[] laby1 : laby) {
-            for (int j = 0; j < laby1.length; j++) {
-                laby1[j] = 0;
-            }
-        }
+        for (int[] laby1 : laby) Arrays.fill(laby1, 0);
+        Arrays.fill(tuiles, 0);
+        Arrays.fill(quartTuiles, 0);
+        nbQuartTuiles = 0;
+        nbTuiles = 0;
+        readingIndex = 0;
+        readingColors = false;
+        readingQuartTuiles = false;
+        readingTiles = false;
+        readingMap = false;
         repaint();
     }
 
@@ -57,11 +68,11 @@ public class T4DrawingPanel extends JPanel {
         for(int i = 0; i < laby.length; i++) {
             for (int j = 0; j < laby[i].length; j++) {
                 g.setColor(Color.BLUE);
-                if (j==0) g.drawString(""+(i+1), 10, i*CELL_SIZE+20+CELL_SIZE);
-                if (i==0) g.drawString(""+(j+1), j*CELL_SIZE+10+CELL_SIZE, 20);
-                drawTile(g,j*CELL_SIZE+CELL_SIZE, i*CELL_SIZE+CELL_SIZE, laby[i][j]);
+                if (j==0) g.drawString(""+(i+1), 5, i*CELL_SIZE+15+CELL_SIZE);
+                if (i==0) g.drawString(""+(j+1), j*CELL_SIZE+5+CELL_SIZE, 15);
+                drawTile(g,j*CELL_SIZE+CELL_SIZE+4, i*CELL_SIZE+CELL_SIZE+4, laby[i][j]);
             }
-        }          
+        }
     }
 
     private void drawTile(Graphics g, int x, int y, int tile) {
@@ -75,7 +86,7 @@ public class T4DrawingPanel extends JPanel {
     private void drawQuartTile(Graphics g, int x, int y, int tileIndex) {
         int quartTuileIndex = tileIndex*6;
         for(int i=0; i<6; i++)
-            drawQuartTileLine(g, x, y+i*pixelSize, quartTuiles[quartTuileIndex]);
+            drawQuartTileLine(g, x, y+i*pixelSize, quartTuiles[quartTuileIndex+i]);
     }
 
     /*
@@ -95,7 +106,7 @@ NUMBER	STANDARD COLOR	INVERTED COLOR
 
     Color[] invertedColors = {Color.WHITE, Color.CYAN, Color.MAGENTA, Color.BLUE, Color.YELLOW, Color.GREEN, Color.RED, Color.BLACK};
 
-    private void switchColor(Graphics g, int x, int y, boolean inverted) {
+    private void switchColor(Graphics g, int y, boolean inverted) {
         if (inverted) {
             if ((y/pixelSize)%2==0) {
                 g.setColor(invertedColors[couleurPair]);
@@ -132,7 +143,7 @@ NUMBER	STANDARD COLOR	INVERTED COLOR
         // bit 1
         boolean bit1 = (val & 0x1) > 0;
 
-        switchColor(g, x, y, inverse);
+        switchColor(g, y, inverse);
 
         if (bit6)
             g.fillRect(x, y, pixelSize, pixelSize);
@@ -152,8 +163,8 @@ NUMBER	STANDARD COLOR	INVERTED COLOR
 
 void mousePressed(MouseEvent evt) {
         int i, j;
-        i = (int) ((evt.getY() - CELL_SIZE) / CELL_SIZE);
-        j = (int) ((evt.getX() - CELL_SIZE) / CELL_SIZE);
+        i = (evt.getY() - CELL_SIZE) / CELL_SIZE;
+        j = (evt.getX() - CELL_SIZE) / CELL_SIZE;
         if(i < HEIGHT && j < WIDTH)
             laby[i][j] = currentValue;
         repaint();
@@ -193,7 +204,7 @@ void mousePressed(MouseEvent evt) {
         
         // save the laby
         for (int i = 0; i < maxI+1; i++) {
-            file.print(""+(1000+i)+" DATA ");
+            file.print((1000+i)+" DATA ");
             for (int j = 0; j < maxJ+1; j++) {
                 if (laby[i][j] < 10)
                     file.print(" ");
@@ -206,53 +217,38 @@ void mousePressed(MouseEvent evt) {
         file.close();
     }
 
+
+
     public void loadLaby(String fileName) throws IOException {
         clear();
         BufferedReader file = new BufferedReader(new FileReader(fileName));
         // read the laby
         String line;
         int i = 0; int j = 0;
-        boolean readingColors = false;
-        int readingIndex = 0;
-        boolean readingQuartTuiles = false;
-        boolean readingTiles = false;
-        boolean readingMap = false;
         while((line = file.readLine()) != null) {
             if (line.startsWith("hires_et_atributs")) {
                 readingColors = true;
-            } else if (readingColors) {
-                if(line.contains("lda")) {
-                    String [] tab = line.strip().split(" ");
-                    int couleur;
-                    if (tab[1].startsWith("#$")) {
-                        couleur = Integer.parseInt(tab[1].substring(2),16);
-                        System.out.println("Couleur Trouvée : "+couleur);
-                    } else if (tab[1].startsWith("#")) {
-                        couleur = Integer.parseInt(tab[1].substring(1));
-                        System.out.println("Couleur Trouvée : "+couleur);
-                    } else {
-                        System.err.println("Wrong color at line : "+line);
-                        couleur = 3;
-                    }
-                    if (readingIndex==0) {
-                        couleurPair = couleur;
-                        System.out.println("Couleur Paire : "+couleur);
-                        readingIndex++;
-                    } else {
-                        couleurImpair = couleur;
-                        System.out.println("Couleur Impaire : "+couleur);
-                        readingColors = false;
-                    }
-                }
             } else if(line.startsWith("_L00")) {
                 readingMap = true;
                 i = 0;
                 j = 0;
                 System.out.println("Début Map");
-            } else if (readingMap) {
+            } else if(line.startsWith("dta_car_redef_p1")) {
+                endReadingTuiles();
+                readingQuartTuiles = true;
+                System.out.println("Début Quarts de Tuiles");
+                readingIndex = 0;
+            }
+            else if (line.startsWith("_t00")) {
+                endReadingQuartTuiles();
+                readingTiles = true;
+                readingIndex = 0;
+                System.out.println("Début Tuiles");
+            }
+            else if (readingMap) {
                 if (line.contains(".byt")) {
                     String [] tab = line.strip().split("[$ ,]");
-                    ArrayList<String> list = new ArrayList<String>(Arrays.asList(tab));
+                    ArrayList<String> list = new ArrayList<>(Arrays.asList(tab));
                     // System.out.println(list);
                     list.removeAll(Arrays.asList("", null));
                     // System.out.println(list);
@@ -269,69 +265,125 @@ void mousePressed(MouseEvent evt) {
                     System.out.println("Nb Colonnes "+(j-1));
                     j=0;
                 } else if (line.contains("ptr_Lignes")) {
-                    System.out.println("Fin Map");
-                    System.out.println("Nb Lignes "+(i-1));
-                    readingMap = false;
+                    endReadingMap(i);
                 }
-            } else if(line.startsWith("dta_car_redef_p1")) {
-                readingQuartTuiles = true;
-                System.out.println("Début Quarts de Tuiles");
-                readingIndex = 0;
-            } else if (readingQuartTuiles) {
+            }
+            else if (readingColors) {
+                readingColors(line);
+            }  else if (readingQuartTuiles) {
+                readingQuartTuile(line);
+            }
+            else if (readingTiles) {
                 if (line.contains(".byt")) {
-                    String[] tab = line.strip().split("[$ ,\t]");
-                    ArrayList<String> list = new ArrayList<String>(Arrays.asList(tab));
-                    // System.out.println(list);
-                    list.removeAll(Arrays.asList("", null));
-                    // System.out.println(list);
-                    for (String oct : list) {
-                        if (oct.startsWith(";")) { // comment
-                            break;
-                        } else {
-                            try {
-                                quartTuiles[readingIndex] = Integer.parseInt(oct, 16);
-                                readingIndex++;
-                                break; // 1 seul par ligne
-                            } catch (NumberFormatException e) {
-                            }
-                        }
-                    }
-                } else if (line.startsWith("_t00")) {
-                    readingTiles = true;
-                    readingQuartTuiles = false;
-                    nbQuartTuiles = readingIndex;
-                    System.out.println("Quart de tuiles total : "+nbQuartTuiles);
-                    System.out.println("Quart de tuiles div 6 : "+(nbQuartTuiles/6));
-                    readingIndex = 0;
-                    System.out.println("Début Tuiles");
-                }
-            }  else if (readingTiles) {
-                if (line.contains(".byt")) {
-                    String[] tab = line.strip().split("[$ ,\t]");
-                    ArrayList<String> list = new ArrayList<String>(Arrays.asList(tab));
-                    // System.out.println(list);
-                    list.removeAll(Arrays.asList("", null));
-                    // System.out.println(list);
-                    for (String oct : list) {
-                        if (oct.startsWith(";")) {// comment
-                            break;
-                        } else {
-                            try {
-                                tuiles[readingIndex] = Integer.parseInt(oct, 16);
-                                readingIndex++;
-                            } catch (NumberFormatException e) {
-                            }
-                        }
-                    }
+                    readingTuile(line);
                 } else if (line.startsWith("ptr_t")) {
                     nbTuiles = readingIndex;
                     System.out.println("Tuiles total : "+nbTuiles);
                     System.out.println("Tuiles div 4 : "+(nbTuiles/4));
-                    file.close();
-                    repaint();
-                    return;
+
+                    if (nbQuartTuiles > 0) {
+                        // on a tout lu
+                        file.close();
+                        repaint();
+                        return;
+                    }
                 }
             }
+        }
+        endReadingQuartTuiles();
+        endReadingTuiles();
+        file.close();
+        repaint();
+    }
+
+    private void readingTuile(String line) {
+        String[] tab = line.strip().split("[$ ,\t]");
+        ArrayList<String> list = new ArrayList<>(Arrays.asList(tab));
+        // System.out.println(list);
+        list.removeAll(Arrays.asList("", null));
+        // System.out.println(list);
+        for (String oct : list) {
+            if (oct.startsWith(";")) {// comment
+                break;
+            } else {
+                try {
+                    tuiles[readingIndex] = Integer.parseInt(oct, 16);
+                    readingIndex++;
+                } catch (NumberFormatException e) {
+                }
+            }
+        }
+    }
+
+    private void readingQuartTuile(String line) {
+        if (line.contains(".byt")) {
+            String[] tab = line.strip().split("[$ ,\t]");
+            ArrayList<String> list = new ArrayList<>(Arrays.asList(tab));
+            // System.out.println(list);
+            list.removeAll(Arrays.asList("", null));
+            // System.out.println(list);
+            for (String oct : list) {
+                if (oct.startsWith(";")) { // comment
+                    break;
+                } else {
+                    try {
+                        quartTuiles[readingIndex] = Integer.parseInt(oct, 16);
+                        readingIndex++;
+                        break; // 1 seul par ligne
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            }
+        }
+    }
+
+    private void endReadingMap(int i) {
+        System.out.println("Fin Map");
+        System.out.println("Nb Lignes "+(i -1));
+        readingMap = false;
+    }
+
+    private void readingColors(String line) {
+        if(line.contains("lda")) {
+            String [] tab = line.strip().split(" ");
+            int couleur;
+            if (tab[1].startsWith("#$")) {
+                couleur = Integer.parseInt(tab[1].substring(2),16);
+                System.out.println("Couleur Trouvée : "+couleur);
+            } else if (tab[1].startsWith("#")) {
+                couleur = Integer.parseInt(tab[1].substring(1));
+                System.out.println("Couleur Trouvée : "+couleur);
+            } else {
+                System.err.println("Wrong color at line : "+line);
+                couleur = 3;
+            }
+            if (readingIndex==0) {
+                couleurPair = couleur;
+                System.out.println("Couleur Paire : "+couleur);
+                readingIndex++;
+            } else {
+                couleurImpair = couleur;
+                System.out.println("Couleur Impaire : "+couleur);
+                readingColors = false;
+            }
+        }
+    }
+
+    private void endReadingTuiles() {
+        if (readingTiles) {
+            nbTuiles = readingIndex;
+            System.out.println("Tuiles total : "+nbTuiles);
+            System.out.println("Tuiles div 4 : "+(nbTuiles/4));
+            readingTiles = false;
+        }
+    }
+
+    private void endReadingQuartTuiles() {
+        if (readingQuartTuiles) {
+            nbQuartTuiles = readingIndex;
+            System.out.println("Quart de tuiles total : " + nbQuartTuiles);
+            System.out.println("Quart de tuiles div 6 : " + (nbQuartTuiles / 6));
+            readingQuartTuiles = false;
         }
     }
 
