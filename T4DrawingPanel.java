@@ -25,6 +25,8 @@ public class T4DrawingPanel extends JPanel {
     private static final int MAX_FONT = 1024;
     private static final int pixelSize = 2;
     private final int[][] laby = new int[HEIGHT][WIDTH];
+    private int largeurLaby = 0;
+    private int hauteurLaby = 0;
     private int couleurPair = 0;
     private int couleurImpair = 0;
     private final int[] quartTuiles = new int[MAX_FONT*4];
@@ -58,6 +60,8 @@ public class T4DrawingPanel extends JPanel {
         readingQuartTuiles = false;
         readingTiles = false;
         readingMap = false;
+        largeurLaby = 0;
+        hauteurLaby = 0;
         repaint();
     }
 
@@ -70,7 +74,9 @@ public class T4DrawingPanel extends JPanel {
                 g.setColor(Color.BLUE);
                 if (j==0) g.drawString(""+(i+1), 5, i*CELL_SIZE+15+CELL_SIZE);
                 if (i==0) g.drawString(""+(j+1), j*CELL_SIZE+5+CELL_SIZE, 15);
-                drawTile(g,j*CELL_SIZE+CELL_SIZE+4, i*CELL_SIZE+CELL_SIZE+4, laby[i][j]);
+                if (j<largeurLaby && i < hauteurLaby) {
+                    drawTile(g, j * CELL_SIZE + CELL_SIZE + 4, i * CELL_SIZE + CELL_SIZE + 4, laby[i][j]);
+                }
             }
         }
     }
@@ -165,8 +171,12 @@ void mousePressed(MouseEvent evt) {
         int i, j;
         i = (evt.getY() - CELL_SIZE) / CELL_SIZE;
         j = (evt.getX() - CELL_SIZE) / CELL_SIZE;
-        if(i < HEIGHT && j < WIDTH)
+        if(i < HEIGHT && j < WIDTH) {
             laby[i][j] = currentValue;
+
+            if (i>hauteurLaby) hauteurLaby = i;
+            if (j>largeurLaby) largeurLaby = j;
+        }
         repaint();
     }
 
@@ -224,14 +234,11 @@ void mousePressed(MouseEvent evt) {
         BufferedReader file = new BufferedReader(new FileReader(fileName));
         // read the laby
         String line;
-        int i = 0; int j = 0;
         while((line = file.readLine()) != null) {
             if (line.startsWith("hires_et_atributs")) {
                 readingColors = true;
             } else if(line.startsWith("_L00")) {
                 readingMap = true;
-                i = 0;
-                j = 0;
                 System.out.println("Début Map");
             } else if(line.startsWith("dta_car_redef_p1")) {
                 endReadingTuiles();
@@ -252,20 +259,19 @@ void mousePressed(MouseEvent evt) {
                     // System.out.println(list);
                     list.removeAll(Arrays.asList("", null));
                     // System.out.println(list);
+                    largeurLaby=0;
                     for(String oct : list) {
                         if (oct.equalsIgnoreCase(".byt"))
                             continue;
                         try {
-                            laby[i][j] = Integer.parseInt(oct,16);
-                            j++;
+                            laby[hauteurLaby][largeurLaby] = Integer.parseInt(oct,16);
+                            largeurLaby++;
                         } catch (NumberFormatException e) {
                         }
                     }
-                    i++;
-                    System.out.println("Nb Colonnes "+(j-1));
-                    j=0;
+                    hauteurLaby++;
                 } else if (line.contains("ptr_Lignes")) {
-                    endReadingMap(i);
+                    endReadingMap();
                 }
             }
             else if (readingColors) {
@@ -337,9 +343,10 @@ void mousePressed(MouseEvent evt) {
         }
     }
 
-    private void endReadingMap(int i) {
+    private void endReadingMap() {
         System.out.println("Fin Map");
-        System.out.println("Nb Lignes "+(i -1));
+        System.out.println("Nb Colonnes "+(largeurLaby-1));
+        System.out.println("Nb Lignes "+(hauteurLaby-1));
         readingMap = false;
     }
 
