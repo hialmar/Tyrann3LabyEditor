@@ -11,11 +11,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import javax.swing.JPanel;
 
 /**
@@ -27,7 +27,7 @@ public class DrawingPanel extends JPanel {
     private static final int HEIGHT = 22;
     private static final int WIDTH = 32;
     private static final int CELL_SIZE = 30;
-    private int laby[][] = new int[HEIGHT][WIDTH];
+    private final int[][] laby = new int[HEIGHT][WIDTH];
 
     private int currentValue = 1;
     
@@ -39,9 +39,7 @@ public class DrawingPanel extends JPanel {
     
     public void clear() {
         for (int[] laby1 : laby) {
-            for (int j = 0; j < laby1.length; j++) {
-                laby1[j] = 0;
-            }
+            Arrays.fill(laby1, 0);
         }
         repaint();
     }
@@ -86,8 +84,8 @@ public class DrawingPanel extends JPanel {
 
     void mousePressed(MouseEvent evt) {
         int i, j;
-        i = (int) ((evt.getY() - CELL_SIZE) / CELL_SIZE);
-        j = (int) ((evt.getX() - CELL_SIZE) / CELL_SIZE);
+        i = (evt.getY() - CELL_SIZE) / CELL_SIZE;
+        j = (evt.getX() - CELL_SIZE) / CELL_SIZE;
         if(i < HEIGHT && j < WIDTH)
             laby[i][j] = currentValue;
         repaint();
@@ -127,7 +125,7 @@ public class DrawingPanel extends JPanel {
         
         // save the laby
         for (int i = 0; i < maxI+1; i++) {
-            file.print(""+(1000+i)+" DATA ");
+            file.print((1000+i)+" DATA ");
             for (int j = 0; j < maxJ+1; j++) {
                 if (laby[i][j] < 10)
                     file.print(" ");

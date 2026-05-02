@@ -21,9 +21,9 @@ public class T4DrawingPanel extends JPanel {
 
     private static final int HEIGHT = 64;
     private static final int WIDTH = 64;
-    private static final int CELL_SIZE = 24;
+    public static final int CELL_SIZE = 24;
     private static final int MAX_FONT = 1024;
-    private static final int pixelSize = 2;
+    public static final int pixelSize = 2;
     private final int[][] laby = new int[HEIGHT][WIDTH];
     private int largeurLaby = 0;
     private int hauteurLaby = 0;
@@ -48,7 +48,35 @@ public class T4DrawingPanel extends JPanel {
         clear();
         setBackground(Color.BLACK);
     }
-    
+
+    public int getNbTuiles() {
+        return nbTuiles;
+    }
+
+    public int getNbQuartTuiles() {
+        return nbQuartTuiles;
+    }
+
+    public int[] getTuiles() {
+        return tuiles;
+    }
+
+    public int[] getQuartTuiles() {
+        return quartTuiles;
+    }
+
+    public int getCouleurImpair() {
+        return couleurImpair;
+    }
+
+    public int getCouleurPair() {
+        return couleurPair;
+    }
+
+    public Color[] getColors() {
+        return colors;
+    }
+
     public void clear() {
         for (int[] laby1 : laby) Arrays.fill(laby1, 0);
         Arrays.fill(tuiles, 0);
@@ -81,7 +109,7 @@ public class T4DrawingPanel extends JPanel {
         }
     }
 
-    private void drawTile(Graphics g, int x, int y, int tile) {
+    public void drawTile(Graphics g, int x, int y, int tile) {
         int tileIndex = tile*4;
         drawQuartTile(g, x,y, tuiles[tileIndex++]);
         drawQuartTile(g, x+6*pixelSize,y, tuiles[tileIndex++]);
@@ -89,7 +117,7 @@ public class T4DrawingPanel extends JPanel {
         drawQuartTile(g, x+6*pixelSize,y+6*pixelSize, tuiles[tileIndex]);
     }
 
-    private void drawQuartTile(Graphics g, int x, int y, int tileIndex) {
+    public void drawQuartTile(Graphics g, int x, int y, int tileIndex) {
         int quartTuileIndex = tileIndex*6;
         for(int i=0; i<6; i++)
             drawQuartTileLine(g, x, y+i*pixelSize, quartTuiles[quartTuileIndex+i]);
@@ -169,8 +197,8 @@ NUMBER	STANDARD COLOR	INVERTED COLOR
 
 void mousePressed(MouseEvent evt) {
         int i, j;
-        i = (evt.getY() - CELL_SIZE) / CELL_SIZE;
-        j = (evt.getX() - CELL_SIZE) / CELL_SIZE;
+        i = (evt.getY() - CELL_SIZE - 4) / CELL_SIZE;
+        j = (evt.getX() - CELL_SIZE - 4) / CELL_SIZE;
         if(i < HEIGHT && j < WIDTH) {
             laby[i][j] = currentValue;
 

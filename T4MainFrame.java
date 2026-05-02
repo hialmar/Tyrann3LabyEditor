@@ -24,7 +24,9 @@ import java.util.logging.Logger;
  */
 public class T4MainFrame extends javax.swing.JFrame {
 
-    private T4DrawingPanel panel;
+    private final T4DrawingPanel panel;
+
+    private final T4PaletteFrame paletteFrame;
 
     private File savedDirectory = null;
 
@@ -35,8 +37,15 @@ public class T4MainFrame extends javax.swing.JFrame {
      */
     public T4MainFrame() {
         initComponents();
+
+        this.setTitle("T4 Map/City Editor");
         
         panel = new T4DrawingPanel();
+
+        paletteFrame = new T4PaletteFrame(panel);
+
+        paletteFrame.setVisible(true);
+
 
         //panel.setBackground(new Color(255, 255, 255));
         panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
@@ -222,6 +231,7 @@ public class T4MainFrame extends javax.swing.JFrame {
             }
             try {
                 panel.loadLaby(filePath);
+                paletteFrame.refresh();
                 modified = false;
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this,
