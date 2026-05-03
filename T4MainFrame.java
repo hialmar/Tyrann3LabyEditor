@@ -9,7 +9,6 @@ package tyrann3laby;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -105,8 +104,8 @@ public class T4MainFrame extends javax.swing.JFrame {
         jMenuItemQuit = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItemEmpty = new javax.swing.JCheckBoxMenuItem();
-        jMenuItemWall = new javax.swing.JCheckBoxMenuItem();
-        jMenuItemDoor = new javax.swing.JMenuItem();
+        jMenuItemUndo = new javax.swing.JMenuItem();
+        jMenuItemRedo = new javax.swing.JMenuItem();
         jMenuItemOther = new javax.swing.JCheckBoxMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -154,6 +153,22 @@ public class T4MainFrame extends javax.swing.JFrame {
 
         jMenu2.setText("Block");
 
+        jMenuItemUndo.setText("Undo");
+        jMenuItemUndo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemUndoActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItemUndo);
+
+        jMenuItemRedo.setText("Redo");
+        jMenuItemRedo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemRedoActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItemRedo);
+
         jMenuItemEmpty.setText("Empty");
         jMenuItemEmpty.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -161,23 +176,6 @@ public class T4MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMenuItemEmpty);
-
-        jMenuItemWall.setSelected(true);
-        jMenuItemWall.setText("Wall");
-        jMenuItemWall.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemWallActionPerformed(evt);
-            }
-        });
-        jMenu2.add(jMenuItemWall);
-
-        jMenuItemDoor.setText("Simple Door");
-        jMenuItemDoor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemDoorActionPerformed(evt);
-            }
-        });
-        jMenu2.add(jMenuItemDoor);
 
         jMenuItemOther.setText("Other...");
         jMenuItemOther.addActionListener(new java.awt.event.ActionListener() {
@@ -321,17 +319,11 @@ public class T4MainFrame extends javax.swing.JFrame {
     private void jMenuItemEmptyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmptyActionPerformed
         panel.setCurrentValue(0);
         jMenuItemEmpty.setSelected(true);
-        jMenuItemWall.setSelected(false);
-        jMenuItemDoor.setSelected(false);
         jMenuItemOther.setSelected(false); 
     }//GEN-LAST:event_jMenuItemEmptyActionPerformed
 
-    private void jMenuItemWallActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemWallActionPerformed
-        panel.setCurrentValue(1);
-        jMenuItemEmpty.setSelected(false);
-        jMenuItemWall.setSelected(true);
-        jMenuItemDoor.setSelected(false);
-        jMenuItemOther.setSelected(false); 
+    private void jMenuItemUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemWallActionPerformed
+        panel.undo();
     }//GEN-LAST:event_jMenuItemWallActionPerformed
 
     private void jMenuItemOtherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOtherActionPerformed
@@ -358,8 +350,6 @@ public class T4MainFrame extends javax.swing.JFrame {
                 } else {
                     panel.setCurrentValue(i);
                     jMenuItemEmpty.setSelected(false);
-                    jMenuItemWall.setSelected(false);
-                    jMenuItemDoor.setSelected(false);
                     jMenuItemOther.setSelected(true); 
                     jMenuItemOther.setText("Other ("+i+") ...");
                 }
@@ -383,12 +373,8 @@ public class T4MainFrame extends javax.swing.JFrame {
         panel.clear();
     }//GEN-LAST:event_jMenuItemNewActionPerformed
 
-    private void jMenuItemDoorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDoorActionPerformed
-        panel.setCurrentValue(2);
-        jMenuItemEmpty.setSelected(false);
-        jMenuItemWall.setSelected(false);
-        jMenuItemDoor.setSelected(true);
-        jMenuItemOther.setSelected(false); 
+    private void jMenuItemRedoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDoorActionPerformed
+        panel.redo();
     }//GEN-LAST:event_jMenuItemDoorActionPerformed
 
     /**
@@ -430,14 +416,14 @@ public class T4MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItemDoor;
+    private javax.swing.JMenuItem jMenuItemRedo;
     private javax.swing.JCheckBoxMenuItem jMenuItemEmpty;
     private javax.swing.JMenuItem jMenuItemLoad;
     private javax.swing.JMenuItem jMenuItemNew;
     private javax.swing.JCheckBoxMenuItem jMenuItemOther;
     private javax.swing.JMenuItem jMenuItemQuit;
     private javax.swing.JMenuItem jMenuItemSave;
-    private javax.swing.JCheckBoxMenuItem jMenuItemWall;
+    private javax.swing.JMenuItem jMenuItemUndo;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
 }

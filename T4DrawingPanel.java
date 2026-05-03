@@ -42,6 +42,10 @@ public class T4DrawingPanel extends JPanel {
     private boolean readingTiles = false;
     private boolean readingMap = false;
 
+    private UndoCell firstUndo;
+    private UndoCell lastUndo;
+    private UndoCell currentUndo;
+
     public T4DrawingPanel() {
         // set a preferred size for the custom panel.
         setPreferredSize(new Dimension(WIDTH*CELL_SIZE+CELL_SIZE,HEIGHT*CELL_SIZE+CELL_SIZE));
@@ -200,12 +204,43 @@ void mousePressed(MouseEvent evt) {
         i = (evt.getY() - CELL_SIZE - 4) / CELL_SIZE;
         j = (evt.getX() - CELL_SIZE - 4) / CELL_SIZE;
         if(i < HEIGHT && j < WIDTH) {
+            UndoCell newCell = new UndoCell(laby[i][j], currentValue, i, j);
+            if (firstUndo == null) {
+                currentUndo = lastUndo = firstUndo = newCell;
+            } else {
+                lastUndo.setNextCell(newCell);
+                newCell.setPreviousCell(lastUndo);
+                currentUndo = lastUndo = newCell;
+            }
+
             laby[i][j] = currentValue;
 
             if (i>hauteurLaby) hauteurLaby = i;
             if (j>largeurLaby) largeurLaby = j;
         }
         repaint();
+    }
+
+    void undo() {
+        if (currentUndo != null) {
+            // undo
+            laby[currentUndo.getI()][currentUndo.getJ()] = currentUndo.getPreviousValue();
+            repaint();
+            // move
+            if (currentUndo.getPreviousCell() != null)
+                currentUndo = currentUndo.getPreviousCell();
+        }
+    }
+
+    void redo() {
+        if (currentUndo != null) {
+            // undo
+            laby[currentUndo.getI()][currentUndo.getJ()] = currentUndo.getValue();
+            repaint();
+            // move
+            if (currentUndo.getNextCell() != null)
+                currentUndo = currentUndo.getNextCell();
+        }
     }
 
     void mouseReleased(MouseEvent evt) {
