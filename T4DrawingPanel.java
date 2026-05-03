@@ -215,8 +215,14 @@ void mousePressed(MouseEvent evt) {
 
             laby[i][j] = currentValue;
 
-            if (i>hauteurLaby) hauteurLaby = i;
-            if (j>largeurLaby) largeurLaby = j;
+            if (i>hauteurLaby) {
+                newCell.expandHeight(i, hauteurLaby);
+                hauteurLaby = i;
+            }
+            if (j>largeurLaby) {
+                newCell.expandWidth(j, largeurLaby);
+                largeurLaby = j;
+            }
         }
         repaint();
     }
@@ -225,6 +231,12 @@ void mousePressed(MouseEvent evt) {
         if (currentUndo != null) {
             // undo
             laby[currentUndo.getI()][currentUndo.getJ()] = currentUndo.getPreviousValue();
+            if (currentUndo.isExpandedWidth()) {
+                largeurLaby = currentUndo.getPreviousWidth();
+            }
+            if (currentUndo.isExpandedHeight()) {
+                hauteurLaby = currentUndo.getPreviousHeight();
+            }
             repaint();
             // move
             if (currentUndo.getPreviousCell() != null)
@@ -236,6 +248,12 @@ void mousePressed(MouseEvent evt) {
         if (currentUndo != null) {
             // undo
             laby[currentUndo.getI()][currentUndo.getJ()] = currentUndo.getValue();
+            if (currentUndo.isExpandedWidth()) {
+                largeurLaby = currentUndo.getWidth();
+            }
+            if (currentUndo.isExpandedHeight()) {
+                hauteurLaby = currentUndo.getHeight();
+            }
             repaint();
             // move
             if (currentUndo.getNextCell() != null)
