@@ -315,10 +315,11 @@ void mousePressed(MouseEvent evt) {
 
     public void paste() {
         if (copiedEndJ-copiedStartJ<selectEndJ-selectStartJ ||
-            copiedEndI-copiedStartJ<selectEndI-selectStartI)
+            copiedEndI-copiedStartI<selectEndI-selectStartI)
         {
             JOptionPane.showMessageDialog(this,
-                    "The destination region should be smaller or equal to the copied region",
+                    "The destination region should be smaller or equal to the copied region of size : ("+
+                            (copiedEndJ-copiedStartJ+1)+","+(copiedEndI-copiedStartI+1)+")",
                     "Region Error",
                     JOptionPane.ERROR_MESSAGE);
         } else {
