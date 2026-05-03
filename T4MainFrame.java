@@ -9,6 +9,7 @@ package tyrann3laby;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -69,7 +70,7 @@ public class T4MainFrame extends javax.swing.JFrame {
         panel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent evt) {
-                panel.mousePressed(evt);
+                panel.mouseDragged(evt);
             }
 
             @Override
@@ -103,6 +104,9 @@ public class T4MainFrame extends javax.swing.JFrame {
         jMenuItemSave = new javax.swing.JMenuItem();
         jMenuItemQuit = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenuItemSelect = new javax.swing.JMenuItem();
+        jMenuItemCopy = new javax.swing.JMenuItem();
+        jMenuItemPaste = new javax.swing.JMenuItem();
         jMenuItemEmpty = new javax.swing.JCheckBoxMenuItem();
         jMenuItemUndo = new javax.swing.JMenuItem();
         jMenuItemRedo = new javax.swing.JMenuItem();
@@ -152,6 +156,30 @@ public class T4MainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Block");
+
+        jMenuItemSelect.setText("Select");
+        jMenuItemSelect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSelectActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItemSelect);
+
+        jMenuItemCopy.setText("Copy");
+        jMenuItemCopy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemCopyActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItemCopy);
+
+        jMenuItemPaste.setText("Paste");
+        jMenuItemPaste.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemPasteActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItemPaste);
 
         jMenuItemUndo.setText("Undo");
         jMenuItemUndo.addActionListener(new java.awt.event.ActionListener() {
@@ -206,6 +234,18 @@ public class T4MainFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItemPasteActionPerformed(ActionEvent evt) {
+        panel.paste();
+    }
+
+    private void jMenuItemCopyActionPerformed(ActionEvent evt) {
+        panel.copy();
+    }
+
+    private void jMenuItemSelectActionPerformed(ActionEvent evt) {
+        panel.selectMode(evt);
+    }
 
     private void jMenuItemLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLoadActionPerformed
         if(modified) {
@@ -424,6 +464,9 @@ public class T4MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemQuit;
     private javax.swing.JMenuItem jMenuItemSave;
     private javax.swing.JMenuItem jMenuItemUndo;
+    private javax.swing.JMenuItem jMenuItemSelect;
+    private javax.swing.JMenuItem jMenuItemCopy;
+    private javax.swing.JMenuItem jMenuItemPaste;
     private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
 }

@@ -24,6 +24,8 @@ public class T4PalettePanel extends JPanel {
         int val = i*20 + j;
         if (val < nbTuiles)
             drawingPanel.setCurrentValue(i*20 + j);
+        else
+            drawingPanel.selectMode(null);
         repaint();
     }
 

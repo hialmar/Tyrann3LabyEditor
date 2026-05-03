@@ -8,6 +8,7 @@ package tyrann3laby;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.util.ArrayList;
@@ -19,8 +20,8 @@ import java.util.Arrays;
  */
 public class T4DrawingPanel extends JPanel {
 
-    private static final int HEIGHT = 64;
-    private static final int WIDTH = 64;
+    public static final int HEIGHT = 64;
+    public static final int WIDTH = 64;
     public static final int CELL_SIZE = 24;
     private static final int MAX_FONT = 1024;
     public static final int pixelSize = 2;
@@ -45,6 +46,18 @@ public class T4DrawingPanel extends JPanel {
     private UndoCell firstUndo;
     private UndoCell lastUndo;
     private UndoCell currentUndo;
+
+    private boolean selectMode;
+    private int selectStartI = -1;
+    private int selectStartJ = -1;
+    private int selectEndI = -1;
+    private int selectEndJ = -1;
+
+    private final int[][] copiedValues = new int[HEIGHT][WIDTH];
+    private int copiedStartI = -1;
+    private int copiedStartJ = -1;
+    private int copiedEndI = -1;
+    private int copiedEndJ = -1;
 
     public T4DrawingPanel() {
         // set a preferred size for the custom panel.
@@ -94,6 +107,16 @@ public class T4DrawingPanel extends JPanel {
         readingMap = false;
         largeurLaby = 0;
         hauteurLaby = 0;
+        firstUndo = lastUndo = currentUndo = null;
+        selectMode = false;
+        selectStartI = -1;
+        selectStartJ = -1;
+        selectEndI = -1;
+        selectEndJ = -1;
+        copiedStartI = -1;
+        copiedStartJ = -1;
+        copiedEndI = -1;
+        copiedEndJ = -1;
         repaint();
     }
 
@@ -108,6 +131,12 @@ public class T4DrawingPanel extends JPanel {
                 if (i==0) g.drawString(""+(j+1), j*CELL_SIZE+5+CELL_SIZE, 15);
                 if (j<largeurLaby && i < hauteurLaby) {
                     drawTile(g, j * CELL_SIZE + CELL_SIZE + 4, i * CELL_SIZE + CELL_SIZE + 4, laby[i][j]);
+                    if (selectMode) {
+                        if (i>=selectStartI && i <= selectEndI && j>=selectStartJ && j<= selectEndJ) {
+                            g.setColor(Color.RED);
+                            g.drawRect(j * CELL_SIZE + CELL_SIZE + 4, i * CELL_SIZE + CELL_SIZE + 4, CELL_SIZE, CELL_SIZE);
+                        }
+                    }
                 }
             }
         }
@@ -203,63 +232,57 @@ void mousePressed(MouseEvent evt) {
         int i, j;
         i = (evt.getY() - CELL_SIZE - 4) / CELL_SIZE;
         j = (evt.getX() - CELL_SIZE - 4) / CELL_SIZE;
+
         if(i < HEIGHT && j < WIDTH) {
-            UndoCell newCell = new UndoCell(laby[i][j], currentValue, i, j);
-            if (firstUndo == null) {
-                currentUndo = lastUndo = firstUndo = newCell;
+            if (selectMode) {
+                selectStartI = selectEndI = i;
+                selectStartJ = selectEndJ = j;
             } else {
-                lastUndo.setNextCell(newCell);
-                newCell.setPreviousCell(lastUndo);
-                currentUndo = lastUndo = newCell;
-            }
+                UndoCell newCell = new UndoCell(laby[i][j], currentValue, i, j);
+                if (firstUndo == null) {
+                    currentUndo = lastUndo = firstUndo = newCell;
+                } else {
+                    lastUndo.setNextCell(newCell);
+                    newCell.setPreviousCell(lastUndo);
+                    currentUndo = lastUndo = newCell;
+                }
 
-            laby[i][j] = currentValue;
+                laby[i][j] = currentValue;
 
-            if (i>hauteurLaby) {
-                newCell.expandHeight(i, hauteurLaby);
-                hauteurLaby = i;
-            }
-            if (j>largeurLaby) {
-                newCell.expandWidth(j, largeurLaby);
-                largeurLaby = j;
+                if (i > hauteurLaby) {
+                    newCell.expandHeight(i, hauteurLaby);
+                    hauteurLaby = i;
+                }
+                if (j > largeurLaby) {
+                    newCell.expandWidth(j, largeurLaby);
+                    largeurLaby = j;
+                }
             }
         }
         repaint();
     }
 
-    void undo() {
-        if (currentUndo != null) {
-            // undo
-            laby[currentUndo.getI()][currentUndo.getJ()] = currentUndo.getPreviousValue();
-            if (currentUndo.isExpandedWidth()) {
-                largeurLaby = currentUndo.getPreviousWidth();
+    public void selectMode(ActionEvent evt) {
+        selectMode = true;
+    }
+
+    public void mouseDragged(MouseEvent evt) {
+        if (selectMode) {
+            int i, j;
+            i = (evt.getY() - CELL_SIZE - 4) / CELL_SIZE;
+            j = (evt.getX() - CELL_SIZE - 4) / CELL_SIZE;
+
+            if(i < HEIGHT && j < WIDTH) {
+                selectEndI = i;
+                selectEndJ = j;
+
+                repaint();
             }
-            if (currentUndo.isExpandedHeight()) {
-                hauteurLaby = currentUndo.getPreviousHeight();
-            }
-            repaint();
-            // move
-            if (currentUndo.getPreviousCell() != null)
-                currentUndo = currentUndo.getPreviousCell();
+        } else {
+            mousePressed(evt);
         }
     }
 
-    void redo() {
-        if (currentUndo != null) {
-            // undo
-            laby[currentUndo.getI()][currentUndo.getJ()] = currentUndo.getValue();
-            if (currentUndo.isExpandedWidth()) {
-                largeurLaby = currentUndo.getWidth();
-            }
-            if (currentUndo.isExpandedHeight()) {
-                hauteurLaby = currentUndo.getHeight();
-            }
-            repaint();
-            // move
-            if (currentUndo.getNextCell() != null)
-                currentUndo = currentUndo.getNextCell();
-        }
-    }
 
     void mouseReleased(MouseEvent evt) {
     }
@@ -277,12 +300,93 @@ void mousePressed(MouseEvent evt) {
         mouseEntered(e);
     }
 
+
+    public void copy() {
+        for(int i = 0; i<selectEndI-selectStartI+1;i++) {
+            for(int j = 0; j<selectEndJ-selectStartJ+1; j++) {
+                copiedValues[i][j] = laby[selectStartI+i][selectStartJ+j];
+            }
+        }
+        copiedStartI = selectStartI;
+        copiedStartJ = selectStartJ;
+        copiedEndI = selectEndI;
+        copiedEndJ = selectEndJ;
+    }
+
+    public void paste() {
+        if (copiedEndJ-copiedStartJ<selectEndJ-selectStartJ ||
+            copiedEndI-copiedStartJ<selectEndI-selectStartI)
+        {
+            JOptionPane.showMessageDialog(this,
+                    "The destination region should be smaller or equal to the copied region",
+                    "Region Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } else {
+            RegionUndoCell newCell = new RegionUndoCell(selectStartI, selectStartJ, selectEndI, selectEndJ, laby, copiedValues);
+            if (firstUndo == null) {
+                currentUndo = lastUndo = firstUndo = newCell;
+            } else {
+                lastUndo.setNextCell(newCell);
+                newCell.setPreviousCell(lastUndo);
+                currentUndo = lastUndo = newCell;
+            }
+            newCell.redoLabyChanges(laby);
+            repaint();
+        }
+    }
+
+
+    void undo() {
+        if (currentUndo != null) {
+            // undo
+            if (currentUndo instanceof RegionUndoCell) {
+                RegionUndoCell regionUndoCell = (RegionUndoCell) currentUndo;
+                regionUndoCell.undoLabyChanges(laby);
+            } else {
+                laby[currentUndo.getI()][currentUndo.getJ()] = currentUndo.getPreviousValue();
+                if (currentUndo.isExpandedWidth()) {
+                    largeurLaby = currentUndo.getPreviousWidth();
+                }
+                if (currentUndo.isExpandedHeight()) {
+                    hauteurLaby = currentUndo.getPreviousHeight();
+                }
+            }
+            repaint();
+            // move
+            if (currentUndo.getPreviousCell() != null)
+                currentUndo = currentUndo.getPreviousCell();
+        }
+    }
+
+    void redo() {
+        if (currentUndo != null) {
+            // undo
+            if (currentUndo instanceof RegionUndoCell) {
+                RegionUndoCell regionUndoCell = (RegionUndoCell) currentUndo;
+                regionUndoCell.redoLabyChanges(laby);
+            } else {
+                laby[currentUndo.getI()][currentUndo.getJ()] = currentUndo.getValue();
+                if (currentUndo.isExpandedWidth()) {
+                    largeurLaby = currentUndo.getWidth();
+                }
+                if (currentUndo.isExpandedHeight()) {
+                    hauteurLaby = currentUndo.getHeight();
+                }
+            }
+            repaint();
+            // move
+            if (currentUndo.getNextCell() != null)
+                currentUndo = currentUndo.getNextCell();
+        }
+    }
+
     public int getCurrentValue() {
         return currentValue;
     }
 
     public void setCurrentValue(int currentValue) {
         this.currentValue = currentValue;
+        this.selectMode = false;
     }
 
     public int[][] getLaby() {
@@ -487,6 +591,5 @@ void mousePressed(MouseEvent evt) {
             readingQuartTuiles = false;
         }
     }
-
 
 }
