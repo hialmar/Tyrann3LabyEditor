@@ -60,12 +60,22 @@ public class T4MainFrame extends javax.swing.JFrame {
             public void mouseReleased(MouseEvent evt) {
                 panel.mouseReleased(evt);
             }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                panel.mouseEntered(e);
+            }
         });
         
         panel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent evt) {
                 panel.mousePressed(evt);
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                panel.mouseMoved(e);
             }
         });
         

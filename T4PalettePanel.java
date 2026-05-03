@@ -20,9 +20,14 @@ public class T4PalettePanel extends JPanel {
         int i, j;
         j = (evt.getY() - 5) / CELL_SIZE;
         i = (evt.getX() - 5) / CELL_SIZE;
-        drawingPanel.setCurrentValue(i*20 + j);
+        int nbTuiles = drawingPanel.getNbTuiles()/4;
+        int val = i*20 + j;
+        if (val < nbTuiles)
+            drawingPanel.setCurrentValue(i*20 + j);
         repaint();
     }
+
+
 
     public void mouseReleased(MouseEvent evt) {
     }
@@ -37,11 +42,30 @@ public class T4PalettePanel extends JPanel {
 
         int nbTuiles = drawingPanel.getNbTuiles()/4;
         int j = 0;
-        for(int i = 0; i< nbTuiles; i++) {
+        int i = 0;
+        for(; i< nbTuiles; i++) {
             drawingPanel.drawTile(g, 5+j* CELL_SIZE, 5+(i%20)* CELL_SIZE, i);
             if ((i%20) == 19) {
                 j++;
             }
         }
+        // draw a red empty rectangle
+        g.setColor(Color.RED);
+        g.drawRect(5+j* CELL_SIZE, 5+(i%20)* CELL_SIZE, CELL_SIZE-1, CELL_SIZE-1);
+    }
+
+
+    public void mouseEntered(MouseEvent evt) {
+        int i, j;
+        j = (evt.getY() - 5) / CELL_SIZE;
+        i = (evt.getX() - 5) / CELL_SIZE;
+        int nbTuiles = drawingPanel.getNbTuiles()/4;
+        int val = i*20 + j;
+        if (val < nbTuiles)
+            this.setToolTipText(String.valueOf(val));
+    }
+
+    public void mouseMoved(MouseEvent e) {
+        mouseEntered(e);
     }
 }

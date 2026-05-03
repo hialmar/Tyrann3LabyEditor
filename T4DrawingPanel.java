@@ -211,6 +211,19 @@ void mousePressed(MouseEvent evt) {
     void mouseReleased(MouseEvent evt) {
     }
 
+    public void mouseEntered(MouseEvent evt) {
+        int i, j;
+        i = (evt.getY() - CELL_SIZE - 4) / CELL_SIZE;
+        j = (evt.getX() - CELL_SIZE - 4) / CELL_SIZE;
+        if(i>=0 && i < HEIGHT && j >=0 && j < WIDTH) {
+            this.setToolTipText(String.valueOf(laby[i][j]));
+        }
+    }
+
+    public void mouseMoved(MouseEvent e) {
+        mouseEntered(e);
+    }
+
     public int getCurrentValue() {
         return currentValue;
     }
@@ -421,5 +434,6 @@ void mousePressed(MouseEvent evt) {
             readingQuartTuiles = false;
         }
     }
+
 
 }
