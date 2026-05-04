@@ -421,6 +421,9 @@ _L00
 	.byt $13,$02,$01,$02,$01,$02,$01,$02,$01,$13,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$03,$04
 
          */
+        file.println("\t;*******************************************");
+        file.println("\t;*******    DATA PLAN/VILLE XX  ************");
+        file.println("\t;*******************************************");
         for (int i = 0; i < maxI+1; i++) {
             String lineNumber = String.format("%02d",i);
             file.println("_L"+lineNumber);
@@ -439,7 +442,9 @@ _L00
                 .byt <_L00,>_L00,<_L01,>_L01,<_L02,>_L02,<_L03,>_L03,<_L04,>_L04,<_L05,>_L05,<_L06,>_L06,<_L07,>_L07,<_L08,>_L08,<_L09,>_L09
                 .byt <_L10,>_L10,<_L11,>_L11,<_L12,>_L12,<_L13,>_L13,<_L14,>_L14,<_L15,>_L15,<_L16,>_L16,<_L17,>_L17,<_L18,>_L18,<_L19,>_L19
 */
+        file.println();
         file.println("ptr_Lignes");
+        file.println();
         for (int i = 0; i < maxI+1; i++) {
             if (i % 10 == 0)
                 file.print("\t.byt ");
@@ -450,6 +455,107 @@ _L00
             if (i % 10 == 9)
                 file.println();
         }
+
+        file.println();
+        file.println("; -----------------------------------------------");
+        file.println(";       Table redéfinition  2nd jeu de car");
+        file.println("; -----------------------------------------------");
+
+        file.println("dta_car_redef_p1");
+        for(int i=0; i<this.nbQuartTuiles; i++) {
+            if (i%6 == 0) {
+                String carNumber = String.format("%02X",i/6);
+                int adresse = 0x9d00 + i;
+                String adresseStr = String.format("%x",adresse);
+                file.println(";"+carNumber+" en $"+adresseStr);
+            }
+            String val = String.format("%02x",quartTuiles[i]);
+            String binaire = "";
+            int quartTuile = quartTuiles[i];
+            int diviseur = 128;
+            while (diviseur > 0) {
+                if (quartTuile/diviseur == 1) {
+                    binaire += '1';
+                    quartTuile -= diviseur;
+                } else {
+                    binaire += '0';
+                }
+                if (diviseur>1)
+                    binaire += ',';
+                diviseur/=2;
+            }
+            file.println("\t.byt $"+val+"	;"+binaire);
+            if (i%6 == 5) {
+                file.println();
+                if(i/6==0x29) {
+                    file.println("dta_car_redef_p2");
+                }
+                if(i/6==0x53) {
+                    file.println("dta_car_redef_p3");
+                }
+            }
+        }
+
+        file.println("; --------------------------------------------------------------------");
+        file.println(";    Table redefinition  des tuiles (N)d'ordre des 4 car redefinis");
+        file.println("; --------------------------------------------------------------------");
+
+        for(int i=0; i<this.nbTuiles; i++) {
+            if(i%4 == 0) {
+                String tileNumber = String.format("%02x",i/4);
+                file.println("_t"+tileNumber+" ");
+                file.print("\t\t.byt ");
+            }
+            String quartTile = String.format("%02x", tuiles[i]);
+            file.print("$"+quartTile);
+            if (i%4 != 3)
+                file.print(",");
+            else
+                file.println();
+        }
+
+        file.println("; -----------------------------------------------");
+        file.println(";       Table des pointeurs adresse tuiles  ");
+        file.println("; -----------------------------------------------");
+        file.println("ptr_t ;(pointeurs t pour tuiles)");
+
+        for (int i = 0; i<this.nbTuiles/4; i++) {
+            int nbTuile = i;
+            if (nbTuile % 6 == 0)
+                file.print("\t.byt ");
+            String tileNumber = String.format("%02x", nbTuile);
+            file.print("<_t" + tileNumber + ",>_t" + tileNumber);
+            if (i % 6 < 5 && i < this.nbTuiles/4-1)
+                file.print(",");
+            if (i % 6 == 5)
+                file.println();
+        }
+
+        file.println();
+
+        file.println("; -----------------------------------------------------------------------------");
+        file.println(";    Table adresses car modifies dans 2nd jeu de car mode Hires (1/4 de tuile)");
+        file.println("; -----------------------------------------------------------------------------");
+
+        file.println("sous_tuile");
+
+        for(int i=0; i<0x9ff5-0x9d00; i++) {
+            if (i%0x3c == 0)
+                file.print("\t.byt ");
+            if (i%6 == 0) {
+                int adresse = 0x9d00+i;
+                String adresseHiStr = String.format("%x",adresse/256);
+                String adresseLoStr = String.format("%02x",adresse%256);
+                file.print("$"+adresseHiStr+",$"+adresseLoStr);
+                if(i%0x3c == 0x36)
+                    file.println();
+                else if (adresse!=0x9ff4)
+                    file.print(",");
+            }
+        }
+
+        file.println();
+
         file.close();
     }
 
