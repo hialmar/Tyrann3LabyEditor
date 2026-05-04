@@ -108,7 +108,7 @@ public class T4DrawingPanel extends JPanel {
         largeurLaby = 0;
         hauteurLaby = 0;
         firstUndo = lastUndo = currentUndo = null;
-        selectMode = false;
+        selectMode = true;
         selectStartI = -1;
         selectStartJ = -1;
         selectEndI = -1;
@@ -131,11 +131,11 @@ public class T4DrawingPanel extends JPanel {
                 if (i==0) g.drawString(""+(j+1), j*CELL_SIZE+5+CELL_SIZE, 15);
                 if (j<largeurLaby && i < hauteurLaby) {
                     drawTile(g, j * CELL_SIZE + CELL_SIZE + 4, i * CELL_SIZE + CELL_SIZE + 4, laby[i][j]);
-                    if (selectMode) {
-                        if (i>=selectStartI && i <= selectEndI && j>=selectStartJ && j<= selectEndJ) {
-                            g.setColor(Color.RED);
-                            g.drawRect(j * CELL_SIZE + CELL_SIZE + 4, i * CELL_SIZE + CELL_SIZE + 4, CELL_SIZE, CELL_SIZE);
-                        }
+                }
+                if (selectMode) {
+                    if (i>=selectStartI && i <= selectEndI && j>=selectStartJ && j<= selectEndJ) {
+                        g.setColor(Color.RED);
+                        g.drawRect(j * CELL_SIZE + CELL_SIZE + 4, i * CELL_SIZE + CELL_SIZE + 4, CELL_SIZE, CELL_SIZE);
                     }
                 }
             }
@@ -332,6 +332,10 @@ void mousePressed(MouseEvent evt) {
                 currentUndo = lastUndo = newCell;
             }
             newCell.redoLabyChanges(laby);
+            if (selectEndJ+1 > this.largeurLaby)
+                largeurLaby = selectEndJ+1;
+            if (selectEndI+1 > this.hauteurLaby)
+                hauteurLaby = selectEndI+1;
             repaint();
         }
     }

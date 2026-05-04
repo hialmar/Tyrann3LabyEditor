@@ -9,14 +9,13 @@ package tyrann3laby;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW;
 
 /**
  *
@@ -129,13 +128,17 @@ public class T4MainFrame extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItemNew);
 
-        jMenuItemLoad.setText("Load");
+        jMenuItemLoad.setText("Open");
         jMenuItemLoad.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemLoadActionPerformed(evt);
             }
         });
         jMenu1.add(jMenuItemLoad);
+
+        KeyStroke keyStrokeToOpen
+                = KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK);
+        jMenuItemLoad.setAccelerator(keyStrokeToOpen);
 
         jMenuItemSave.setText("Save");
         jMenuItemSave.addActionListener(new java.awt.event.ActionListener() {
@@ -145,6 +148,10 @@ public class T4MainFrame extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItemSave);
 
+        KeyStroke keyStrokeToSave
+                = KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK);
+        jMenuItemSave.setAccelerator(keyStrokeToSave);
+
         jMenuItemQuit.setText("Quit");
         jMenuItemQuit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -152,6 +159,10 @@ public class T4MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItemQuit);
+
+        KeyStroke keyStrokeToQuit
+                = KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_DOWN_MASK);
+        jMenuItemQuit.setAccelerator(keyStrokeToQuit);
 
         jMenuBar1.add(jMenu1);
 
@@ -173,6 +184,10 @@ public class T4MainFrame extends javax.swing.JFrame {
         });
         jMenu2.add(jMenuItemCopy);
 
+        KeyStroke keyStrokeToCopy
+                = KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK);
+        jMenuItemCopy.setAccelerator(keyStrokeToCopy);
+
         jMenuItemPaste.setText("Paste");
         jMenuItemPaste.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -180,6 +195,10 @@ public class T4MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMenuItemPaste);
+
+        KeyStroke keyStrokeToPaste
+                = KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK);
+        jMenuItemPaste.setAccelerator(keyStrokeToPaste);
 
         jMenuItemUndo.setText("Undo");
         jMenuItemUndo.addActionListener(new java.awt.event.ActionListener() {
@@ -189,6 +208,11 @@ public class T4MainFrame extends javax.swing.JFrame {
         });
         jMenu2.add(jMenuItemUndo);
 
+        KeyStroke keyStrokeToUndo
+                = KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK);
+        jMenuItemUndo.setAccelerator(keyStrokeToUndo);
+
+
         jMenuItemRedo.setText("Redo");
         jMenuItemRedo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -196,6 +220,10 @@ public class T4MainFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMenuItemRedo);
+
+        KeyStroke keyStrokeToRedo
+                = KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK|KeyEvent.SHIFT_DOWN_MASK);
+        jMenuItemRedo.setAccelerator(keyStrokeToRedo);
 
         jMenuItemEmpty.setText("Empty");
         jMenuItemEmpty.addActionListener(new java.awt.event.ActionListener() {
