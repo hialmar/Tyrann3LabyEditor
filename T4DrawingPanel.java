@@ -412,16 +412,43 @@ void mousePressed(MouseEvent evt) {
         }
         
         // save the laby
+        /*
+
+        ;*******************************************
+;*******    DATA PLAN VILLE_1   ************
+;*******************************************
+_L00
+	.byt $13,$02,$01,$02,$01,$02,$01,$02,$01,$13,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$02,$01,$03,$04
+
+         */
         for (int i = 0; i < maxI+1; i++) {
-            file.print((1000+i)+" DATA ");
+            String lineNumber = String.format("%02d",i);
+            file.println("_L"+lineNumber);
+            file.print("\t.byt ");
             for (int j = 0; j < maxJ+1; j++) {
-                if (laby[i][j] < 10)
-                    file.print(" ");
-                file.print(laby[i][j]);
+                String val = String.format("%02x",laby[i][j]);
+                file.print("$"+val);
                 if(j+1<maxJ+1)
                     file.print(",");
             }
             file.println();
+        }
+/*
+        ptr_Lignes
+
+                .byt <_L00,>_L00,<_L01,>_L01,<_L02,>_L02,<_L03,>_L03,<_L04,>_L04,<_L05,>_L05,<_L06,>_L06,<_L07,>_L07,<_L08,>_L08,<_L09,>_L09
+                .byt <_L10,>_L10,<_L11,>_L11,<_L12,>_L12,<_L13,>_L13,<_L14,>_L14,<_L15,>_L15,<_L16,>_L16,<_L17,>_L17,<_L18,>_L18,<_L19,>_L19
+*/
+        file.println("ptr_Lignes");
+        for (int i = 0; i < maxI+1; i++) {
+            if (i % 10 == 0)
+                file.print("\t.byt ");
+            String lineNumber = String.format("%02d", i);
+            file.print("<_L" + lineNumber + ",>_L" + lineNumber);
+            if (i % 10 < 9 && i < maxI)
+                file.print(",");
+            if (i % 10 == 9)
+                file.println();
         }
         file.close();
     }
